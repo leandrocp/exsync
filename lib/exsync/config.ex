@@ -66,25 +66,25 @@ defmodule ExSync.Config do
   defp src_default_dirs do
     if Mix.Project.umbrella?() do
       for %Mix.Dep{app: app, opts: opts} <- Mix.Dep.Umbrella.loaded() do
-        Mix.Project.in_project(app, opts[:path], fn _ -> src_default_dirs() end)
+        Mix.Project.in_project(app, opts[:dest], fn _ -> src_default_dirs() end)
       end
     else
-      dep_paths =
-        Mix.Dep.cached()
-        |> Enum.filter(fn dep -> dep.opts[:path] != nil end)
-        |> Enum.map(fn %Mix.Dep{app: app, opts: opts} ->
-          Mix.Project.in_project(app, opts[:path], fn _ -> src_default_dirs() end)
-        end)
+      # dep_paths =
+      #   Mix.Dep.cached()
+      #   |> Enum.filter(fn dep -> dep.opts[:dest] != nil end)
+      #   |> Enum.map(fn %Mix.Dep{app: app, opts: opts} ->
+      #     Mix.Project.in_project(app, opts[:dest], fn _ -> src_default_dirs() end)
+      #   end)
 
       self_paths =
-        Mix.Project.config()
-        |> Keyword.take([:elixirc_paths, :erlc_paths, :erlc_include_path])
+        Mix.Project.config() |> Keyword.take([:elixirc_paths, :erlc_paths, :erlc_include_path])
         |> Keyword.values()
         |> List.flatten()
         |> Enum.map(&Path.join(app_source_dir(), &1))
         |> Enum.filter(&File.exists?/1)
 
-      [self_paths | dep_paths]
+      # [self_paths | dep_paths]
+      [self_paths]
     end
     |> List.flatten()
     |> Enum.uniq()
