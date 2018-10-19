@@ -24,10 +24,10 @@ defmodule ExSync.Utils do
     :code.load_binary(module, file, binary)
   end
 
-  defp log_compile_cmd({_, 0} = result), do: result
-
-  defp log_compile_cmd({out, _} = result) do
-    Logger.info(out)
+  defp log_compile_cmd({out, status} = result) when is_bitstring(out) and status > 0 do
+    out |> Logger.info()
     result
   end
+
+  defp log_compile_cmd(result), do: result
 end
